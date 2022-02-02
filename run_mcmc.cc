@@ -221,13 +221,77 @@ int main(int argc, char *argv[]) {
       (args.get<std::string>("--best-clus-file") != std::string("\"\""))) {
     Eigen::MatrixXi clusterings(coll->get_size(), data.rows());
     Eigen::VectorXi num_clust(coll->get_size());
+    std::vector<Eigen::MatrixXd> mus;
+    std::vector<Eigen::MatrixXd> psis;
+    std::vector<Eigen::MatrixXd> lambda_row0s;
+    std::vector<Eigen::MatrixXd> lambda_lambda_row0s;
+    std::vector<Eigen::MatrixXd> lambda_lambda_psis;
+    int q = 0;
+    int n_iterations = coll->get_size();
     for (int i = 0; i < coll->get_size(); i++) {
       bayesmix::AlgorithmState state;
       coll->get_next_state(&state);
+
       for (int j = 0; j < data.rows(); j++) {
         clusterings(i, j) = state.cluster_allocs(j);
       }
+
+      for (int j = 0; j < state.cluster_states_size(); j++) {
+        if (i == 0) {
+          q = bayesmix::to_eigen(state.cluster_states(j).mfa_state().eta())
+                  .cols();
+          Eigen::MatrixXd mu(coll->get_size(), data.cols());
+          Eigen::MatrixXd psi(coll->get_size(), data.cols());
+          Eigen::MatrixXd lambda_row0(coll->get_size(), q);
+          Eigen::MatrixXd lambda_lambda_row0(coll->get_size(), data.cols());
+          Eigen::MatrixXd lambda_lambda_psi(data.cols(), data.cols());
+          mu.row(i) =
+              bayesmix::to_eigen(state.cluster_states(j).mfa_state().mu());
+          psi.row(i) =
+              bayesmix::to_eigen(state.cluster_states(j).mfa_state().psi());
+          Eigen::MatrixXd lambda =
+              bayesmix::to_eigen(state.cluster_states(j).mfa_state().lambda());
+          lambda_row0.row(i) = lambda.row(0);
+          lambda_lambda_row0.row(i) = (lambda * lambda.transpose()).row(0);
+          lambda_lambda_psi = lambda * lambda.transpose() +
+                              Eigen::MatrixXd(psi.row(i).asDiagonal());
+          lambda_lambda_psis.push_back(lambda_lambda_psi);
+          mus.push_back(mu);
+          psis.push_back(psi);
+          lambda_row0s.push_back(lambda_row0);
+          lambda_lambda_row0s.push_back(lambda_lambda_row0);
+        } else {
+          mus[j].row(i) =
+              bayesmix::to_eigen(state.cluster_states(j).mfa_state().mu());
+          psis[j].row(i) =
+              bayesmix::to_eigen(state.cluster_states(j).mfa_state().psi());
+          Eigen::MatrixXd lambda =
+              bayesmix::to_eigen(state.cluster_states(j).mfa_state().lambda());
+          lambda_row0s[j].row(i) = lambda.row(0);
+          lambda_lambda_row0s[j].row(i) = (lambda * lambda.transpose()).row(0);
+          lambda_lambda_psis[j] +=
+              lambda * lambda.transpose() +
+              Eigen::MatrixXd(psis[j].row(i).asDiagonal());
+        }
+      }
       num_clust(i) = state.cluster_states_size();
+    }
+
+    std::string exp =
+        std::to_string(data.cols()) + "_" + std::to_string(q) + " cluster n";
+    for (int i = 0; i < mus.size(); i++) {
+      bayesmix::write_matrix_to_file(mus[i],
+                                     exp + std::to_string(i) + " mu.csv");
+      bayesmix::write_matrix_to_file(psis[i],
+                                     exp + std::to_string(i) + " psi.csv");
+      bayesmix::write_matrix_to_file(
+          lambda_row0s[i], exp + std::to_string(i) + " lambda_row0s.csv");
+      bayesmix::write_matrix_to_file(
+          lambda_lambda_row0s[i],
+          exp + std::to_string(i) + " lambda__lambda_row0s.csv");
+      bayesmix::write_matrix_to_file(
+          lambda_lambda_psis[i] / n_iterations,
+          exp + std::to_string(i) + " lambda__lambda_psis.csv");
     }
 
     if (args.get<std::string>("--n-cl-file") != std::string("\"\"")) {
