@@ -399,6 +399,8 @@ int main(int argc, char *argv[]) {
     }
   }
 
+  bayesmix::write_matrix_to_file(times, times);
+
   // restore buffer
   std::cout.rdbuf(orig_buf);
 
