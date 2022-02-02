@@ -4,6 +4,7 @@
 #include <chrono>
 #include <fstream>
 #include <iostream>
+#include <string>
 
 #include "lib/argparse/argparse.h"
 #include "src/includes.h"
@@ -306,25 +307,21 @@ void run_serial_mcmc_mfa(const std::string &filename) {
       num_clust(i) = state.cluster_states_size();
     }
 
+    std::string exp =
+        std::to_string(data.cols()) + "_" + std::to_string(q) + " cluster n";
     for (int i = 0; i < mus.size(); i++) {
+      bayesmix::write_matrix_to_file(mus[i],
+                                     exp + std::to_string(i) + " mu.csv");
+      bayesmix::write_matrix_to_file(psis[i],
+                                     exp + std::to_string(i) + " psi.csv");
       bayesmix::write_matrix_to_file(
-          mus[i], data.cols() << "_" << q << " cluster n" << std::to_string(i)
-                              << " mu.csv");
+          lambda_row0s[i], exp + std::to_string(i) + " lambda_row0s.csv");
       bayesmix::write_matrix_to_file(
-          psis[i], data.cols() << "_" << q << " cluster n" << std::to_string(i)
-                               << " psi.csv");
+          lambda_lambda_row0s[i],
+          exp + std::to_string(i) + " lambda__lambda_row0s.csv");
       bayesmix::write_matrix_to_file(
-          lambda_row0s[i], data.cols()
-                               << "_" << q << " cluster n" << std::to_string(i)
-                               << " lambda_row0s");
-      bayesmix::write_matrix_to_file(lambda_lambda_row0s[i],
-                                     data.cols() << "_" << q << " cluster n"
-                                                 << std::to_string(i)
-                                                 << " lambda__lambda_row0s");
-      bayesmix::write_matrix_to_file(lambda_lambda_psis[i] / n_iterations,
-                                     data.cols() << "_" << q << " cluster n"
-                                                 << std::to_string(i)
-                                                 << " lambda__lambda_psis");
+          lambda_lambda_psis[i] / n_iterations,
+          exp + std::to_string(i) + " lambda__lambda_psis.csv");
     }
 
     if (args.get<std::string>("--n-cl-file") != std::string("\"\"")) {
