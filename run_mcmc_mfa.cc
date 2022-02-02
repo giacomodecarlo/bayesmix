@@ -399,7 +399,7 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  bayesmix::write_matrix_to_file(times, times);
+  bayesmix::write_matrix_to_file(times, "times.csv");
 
   // restore buffer
   std::cout.rdbuf(orig_buf);
