@@ -28,11 +28,11 @@
 
   build/run_mcmc \
   --algo-params-file examples/mfa_hierarchy/in/algo.asciipb \
-  --hier-type MFA --hier-args examples/mfa_hierarchy/in/mfa.asciipb \
+  --hier-type MFA --hier-args examples/mfa_hierarchy/in/mfa_auto5.asciipb \
   --mix-type DP --mix-args examples/mfa_hierarchy/in/dp_gamma.asciipb \
   --coll-name examples/mfa_hierarchy/out/chains.recordio \
-  --data-file examples/mfa_hierarchy/in/data.csv \
-  --grid-file examples/mfa_hierarchy/in/grid.csv \
+  --data-file examples/mfa_hierarchy/in/data128_50_5.csv \
+  --grid-file examples/mfa_hierarchy/in/data128_50_5.csv \
   --dens-file examples/mfa_hierarchy/out/density_file.csv \
   --n-cl-file examples/mfa_hierarchy/out/numclust.csv \
   --clus-file examples/mfa_hierarchy/out/clustering.csv \
