@@ -7,16 +7,16 @@
 #
 # the config file should be a txt file like this:
 #
-# --algo-params-file examples/mfa_hierarchy/in/algo.asciipb 
-# --hier-type MFA --hier-args examples/mfa_hierarchy/in/mfa_auto.asciipb 
-# --mix-type DP --mix-args examples/mfa_hierarchy/in/dp_gamma.asciipb 
-# --coll-name examples/mfa_hierarchy/out/chains_auto.recordio 
-# --data-file examples/mfa_hierarchy/in/data.csv 
-# --grid-file examples/mfa_hierarchy/in/data.csv 
-# --dens-file examples/mfa_hierarchy/out/density_file_auto.csv 
-# --n-cl-file examples/mfa_hierarchy/out/numclust_auto.csv 
-# --clus-file examples/mfa_hierarchy/out/clustering_auto.csv 
+# --algo-params-file examples/mfa_hierarchy/in/algo.asciipb
+# --hier-type MFA --hier-args examples/mfa_hierarchy/in/mfa_auto.asciipb
+# --mix-type DP --mix-args examples/mfa_hierarchy/in/dp_gamma.asciipb
+# --coll-name examples/mfa_hierarchy/out/chains_auto.recordio
+# --data-file examples/mfa_hierarchy/in/data.csv
+# --grid-file examples/mfa_hierarchy/in/data.csv
+# --dens-file examples/mfa_hierarchy/out/density_file_auto.csv
+# --n-cl-file examples/mfa_hierarchy/out/numclust_auto.csv
+# --clus-file examples/mfa_hierarchy/out/clustering_auto.csv
 # --best-clus-file resources/tutorial/out/best_clustering.csv
 # --<argument> <value to assign to that specific argument>
 
-./build/run_mcmc_mfa -1 examples/mfa_hierarchy/config128_50_5.txt examples/mfa_hierarchy/config128_50_10.txt examples/mfa_hierarchy/config128_50_20.txt examples/mfa_hierarchy/config128_50_50.txt
+./build/run_mcmc_mfa -1 examples/mfa_hierarchy/config128_50_5.txt examples/mfa_hierarchy/config128_50_20.txt examples/mfa_hierarchy/config128_50_50.txt

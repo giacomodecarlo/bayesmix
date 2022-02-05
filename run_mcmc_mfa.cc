@@ -267,9 +267,11 @@ void run_serial_mcmc_mfa(const std::string &filename) {
       }
 
       for (int j = 0; j < state.cluster_states_size(); j++) {
+        std::cout << i << "  " << j << std::endl;
         if (i == 0) {
           q = bayesmix::to_eigen(state.cluster_states(j).mfa_state().eta())
                   .cols();
+          std::cout << q << std::endl;
           Eigen::MatrixXd mu(coll->get_size(), data.cols());
           Eigen::MatrixXd psi(coll->get_size(), data.cols());
           Eigen::MatrixXd lambda_row0(coll->get_size(), q);
@@ -306,7 +308,7 @@ void run_serial_mcmc_mfa(const std::string &filename) {
       }
       num_clust(i) = state.cluster_states_size();
     }
-
+    std::cout << "Printing cluster files..." << std::endl;
     std::string exp =
         std::to_string(data.cols()) + "_" + std::to_string(q) + " cluster n";
     for (int i = 0; i < mus.size(); i++) {
@@ -380,11 +382,13 @@ int main(int argc, char *argv[]) {
   std::streambuf *orig_buf = std::cout.rdbuf();
 
   // set null
-  std::cout.rdbuf(NULL);
+  // std::cout.rdbuf(NULL);
 
-  Eigen::VectorXd times(argc);
-// Run all the tests in parallel
-#pragma omp parallel for
+  Eigen::VectorXd times(N);
+
+  std::vector<std::exception> exc;
+  // Run all the tests in parallel
+  //#pragma omp parallel for
   for (size_t i = 2; i < argc; ++i) {
     try {
       auto start = std::chrono::steady_clock::now();
@@ -396,14 +400,18 @@ int main(int argc, char *argv[]) {
       times(i - 2) = elapsed_seconds.count();
     } catch (const std::exception &err) {
       n--;
+      exc.push_back(err);
     }
   }
 
   bayesmix::write_matrix_to_file(times, "times.csv");
 
   // restore buffer
-  std::cout.rdbuf(orig_buf);
+  // std::cout.rdbuf(orig_buf);
 
+  for (auto ex : exc) {
+    std::cout << ex.what() << std::endl;
+  }
   std::cout << n << "/" << N << " simulations correctly performed"
             << std::endl;
   return 0;
