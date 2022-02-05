@@ -19,4 +19,4 @@
 # --best-clus-file resources/tutorial/out/best_clustering.csv
 # --<argument> <value to assign to that specific argument>
 
-./build/run_mcmc_mfa -1 examples/mfa_hierarchy/config128_50_5.txt examples/mfa_hierarchy/config128_50_20.txt examples/mfa_hierarchy/config128_50_50.txt
+./build/run_mcmc_mfa -1 examples/mfa_hierarchy/config/config128_50_5.txt examples/mfa_hierarchy/config/config128_50_10.txt examples/mfa_hierarchy/config/config128_50_20.txt examples/mfa_hierarchy/config/config128_50_50.txt
