@@ -308,24 +308,6 @@ void run_serial_mcmc_mfa(const std::string &filename) {
       }
       num_clust(i) = state.cluster_states_size();
     }
-    std::cout << "Printing cluster files..." << std::endl;
-    std::string exp =
-        std::to_string(data.cols()) + "_" + std::to_string(q) + " cluster n";
-    for (int i = 0; i < mus.size(); i++) {
-      bayesmix::write_matrix_to_file(mus[i],
-                                     exp + std::to_string(i) + " mu.csv");
-      bayesmix::write_matrix_to_file(psis[i],
-                                     exp + std::to_string(i) + " psi.csv");
-      bayesmix::write_matrix_to_file(
-          lambda_row0s[i], exp + std::to_string(i) + " lambda_row0s.csv");
-      bayesmix::write_matrix_to_file(
-          lambda_lambda_row0s[i],
-          exp + std::to_string(i) + " lambda__lambda_row0s.csv");
-      bayesmix::write_matrix_to_file(
-          lambda_lambda_psis[i] / n_iterations,
-          exp + std::to_string(i) + " lambda__lambda_psis.csv");
-    }
-
     if (args.get<std::string>("--n-cl-file") != std::string("\"\"")) {
       bayesmix::write_matrix_to_file(num_clust,
                                      args.get<std::string>("--n-cl-file"));
@@ -346,6 +328,24 @@ void run_serial_mcmc_mfa(const std::string &filename) {
           best_clus, args.get<std::string>("--best-clus-file"));
       std::cout << "Successfully wrote best cluster allocations to "
                 << args.get<std::string>("--best-clus-file") << std::endl;
+    }
+
+    std::cout << "Printing cluster files..." << std::endl;
+    std::string exp =
+        std::to_string(data.cols()) + "_" + std::to_string(q) + " cluster n";
+    for (int i = 0; i < mus.size(); i++) {
+      bayesmix::write_matrix_to_file(mus[i],
+                                     exp + std::to_string(i) + " mu.csv");
+      bayesmix::write_matrix_to_file(psis[i],
+                                     exp + std::to_string(i) + " psi.csv");
+      bayesmix::write_matrix_to_file(
+          lambda_row0s[i], exp + std::to_string(i) + " lambda_row0s.csv");
+      bayesmix::write_matrix_to_file(
+          lambda_lambda_row0s[i],
+          exp + std::to_string(i) + " lambda__lambda_row0s.csv");
+      bayesmix::write_matrix_to_file(
+          lambda_lambda_psis[i] / n_iterations,
+          exp + std::to_string(i) + " lambda__lambda_psis.csv");
     }
   }
 
@@ -382,13 +382,13 @@ int main(int argc, char *argv[]) {
   std::streambuf *orig_buf = std::cout.rdbuf();
 
   // set null
-  // std::cout.rdbuf(NULL);
+  std::cout.rdbuf(NULL);
 
   Eigen::VectorXd times(N);
 
   std::vector<std::exception> exc;
-  // Run all the tests in parallel
-  //#pragma omp parallel for
+// Run all the tests in parallel
+#pragma omp parallel for
   for (size_t i = 2; i < argc; ++i) {
     try {
       auto start = std::chrono::steady_clock::now();
@@ -407,7 +407,7 @@ int main(int argc, char *argv[]) {
   bayesmix::write_matrix_to_file(times, "times.csv");
 
   // restore buffer
-  // std::cout.rdbuf(orig_buf);
+  std::cout.rdbuf(orig_buf);
 
   for (auto ex : exc) {
     std::cout << ex.what() << std::endl;
