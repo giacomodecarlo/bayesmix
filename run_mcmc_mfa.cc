@@ -257,17 +257,22 @@ void run_serial_mcmc_mfa(const std::string &filename) {
     std::vector<Eigen::MatrixXd> lambda_lambda_row0s;
     std::vector<Eigen::MatrixXd> lambda_lambda_psis;
     int q = 0;
+    int n_clusters = 0;
     int n_iterations = coll->get_size();
     for (int i = 0; i < coll->get_size(); i++) {
       bayesmix::AlgorithmState state;
       coll->get_next_state(&state);
+      if (i == 0) {
+        n_clusters = state.cluster_states_size();
+      }
 
       for (int j = 0; j < data.rows(); j++) {
         clusterings(i, j) = state.cluster_allocs(j);
       }
 
-      for (int j = 0; j < state.cluster_states_size(); j++) {
-        std::cout << i << "  " << j << std::endl;
+      for (int j = 0; j < std::min(state.cluster_states_size(), n_clusters);
+           j++) {
+        // std::cout << i << "  " << j << std::endl;
         if (i == 0) {
           q = bayesmix::to_eigen(state.cluster_states(j).mfa_state().eta())
                   .cols();
